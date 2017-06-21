@@ -23,6 +23,7 @@ public class GameController : MonoBehaviour {
 
     void Start()
     {
+        Cursor.visible = false;
         instance = this;
         score = 0;
     }

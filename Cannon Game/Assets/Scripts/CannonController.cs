@@ -100,5 +100,6 @@ public class CannonController : MonoBehaviour
     private void ShowGameOverPanel()
     {
         gameOverPanel.SetActive(true);
+        Cursor.visible = true;
     }
 }
