@@ -5,30 +5,19 @@ using UnityEngine.UI;
 
 public class CannonController : MonoBehaviour
 {
-    public float moveSpeed = 1f;
-    public float minShootForce = 1000f;
-    public float shootForceRange = 1000f;
+    public float moveDegPerSec = 90f;
+    public float rotationRangeDeg = 90f;
+    public float shootForce = 1500f;
     public int startingBallCount = 5;
+    public Transform platform;
     public Transform cannon;
     public Transform spawnPoint;
     public GameObject ballPrefab;
-    public Text powerText;
     public Text ballCountText;
-    public GameObject gameOverPanel;
 
+    private float rotation;
     private Camera cam;
     private AudioSource audio;
-
-    private float _power;
-    private float power
-    {
-        get { return _power; }
-        set
-        {
-            _power = value;
-            powerText.text = "Power: " + (int)(power * 100f) + "%";
-        }
-    }
 
     private int _ballCount;
     private int ballCount
@@ -41,7 +30,7 @@ public class CannonController : MonoBehaviour
 
             if (ballCount == 0)
             {
-                Invoke("ShowGameOverPanel", 2f);
+                GameController.instance.Invoke("GameOver", 2f);
             }
         }
     }
@@ -50,13 +39,12 @@ public class CannonController : MonoBehaviour
     {
         cam = GetComponent<Camera>();
         audio = GetComponent<AudioSource>();
-        power = 0.5f;
         ballCount = startingBallCount;
     }
 
     void Update()
     {
-        if (!gameOverPanel.activeSelf)
+        if (!GameController.instance.gameOver)
         {
             CheckKeys();
             CheckMouse();
@@ -65,15 +53,21 @@ public class CannonController : MonoBehaviour
 
     private void CheckKeys()
     {
-        if (Input.GetKey(KeyCode.A) && power < 1)
+        if (rotation < rotationRangeDeg / 2f && (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
         {
-            power += 0.25f * Time.deltaTime;
+            Rotate(moveDegPerSec * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.Z) && power > 0)
+        if (rotation > -rotationRangeDeg / 2f && (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)))
         {
-            power -= 0.25f * Time.deltaTime;
+            Rotate(-moveDegPerSec * Time.deltaTime);
         }
+    }
+
+    private void Rotate(float angle)
+    {
+        rotation += angle;
+        transform.RotateAround(platform.position, Vector3.up, angle);
     }
 
     private void CheckMouse()
@@ -90,16 +84,10 @@ public class CannonController : MonoBehaviour
     private void ShootBall()
     {
         GameObject ball = Instantiate(ballPrefab, spawnPoint.position, Quaternion.identity);
-        Rigidbody rb = ball.GetComponent<Rigidbody>();
+        Rigidbody rigidbody = ball.GetComponent<Rigidbody>();
         Ray mouseRay = cam.ScreenPointToRay(Input.mousePosition);
-        rb.AddForce(mouseRay.direction * (minShootForce + shootForceRange * power));
+        rigidbody.AddForce(mouseRay.direction * shootForce);
         ballCount -= 1;
         audio.Play();
-    }
-
-    private void ShowGameOverPanel()
-    {
-        gameOverPanel.SetActive(true);
-        Cursor.visible = true;
     }
 }

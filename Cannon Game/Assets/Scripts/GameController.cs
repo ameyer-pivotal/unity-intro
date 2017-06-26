@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour {
     public static GameController instance;
 
     public Text scoreText;
+    public GameObject gameOverPanel;
 
     private int _score;
     public int score
@@ -21,11 +22,19 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    public bool gameOver { get { return gameOverPanel.activeSelf; } }
+
     void Start()
     {
         Cursor.visible = false;
         instance = this;
         score = 0;
+    }
+
+    public void GameOver()
+    {
+        gameOverPanel.SetActive(true);
+        Cursor.visible = true;
     }
 
     public void StartNewGame()
