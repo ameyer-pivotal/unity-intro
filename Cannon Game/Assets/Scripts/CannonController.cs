@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class CannonController : MonoBehaviour
 {
     public float moveDegPerSec = 90f;
-    public float rotationRangeDeg = 90f;
     public float shootForce = 1500f;
     public int startingBallCount = 5;
     public Transform platform;
@@ -15,7 +14,6 @@ public class CannonController : MonoBehaviour
     public GameObject ballPrefab;
     public Text ballCountText;
 
-    private float rotation;
     private Camera cam;
     private AudioSource audio;
 
@@ -53,21 +51,15 @@ public class CannonController : MonoBehaviour
 
     private void CheckKeys()
     {
-        if (rotation < rotationRangeDeg / 2f && (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            Rotate(moveDegPerSec * Time.deltaTime);
+			transform.RotateAround(platform.position, Vector3.up, moveDegPerSec * Time.deltaTime);
         }
 
-        if (rotation > -rotationRangeDeg / 2f && (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)))
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            Rotate(-moveDegPerSec * Time.deltaTime);
+			transform.RotateAround(platform.position, Vector3.up, -moveDegPerSec * Time.deltaTime);
         }
-    }
-
-    private void Rotate(float angle)
-    {
-        rotation += angle;
-        transform.RotateAround(platform.position, Vector3.up, angle);
     }
 
     private void CheckMouse()
